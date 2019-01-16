@@ -1,0 +1,144 @@
+<odoo>
+  <data>
+
+    <menuitem name="Construction" 
+      id="menu_root" 
+      sequence="100"
+      web_icon="construction,static/description/icon.png" />
+
+    <record model="ir.ui.view" id="construction.project_tree">
+      <field name="name">Danh sach du an</field>
+      <field name="model">construction.project</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="commencement_date"/>
+          <field name="investor"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="construction.project_form">
+      <field name="name">Thong tin du an</field>
+      <field name="model">construction.project</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name" />
+              <field name="commencement_date" />
+              <field name="investor" />
+            </group>
+            <group>
+              <field name="type_project" />
+            </group>
+            <group>
+              <field name="list_state" />
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- actions opening views on models -->
+    
+    <record model="ir.actions.act_window" id="construction.act_window_project">
+      <field name="name">Quan ly du an windown</field>
+      <field name="res_model">construction.project</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Project" 
+      id="construction.project"
+      parent="menu_root" 
+      sequence="10"
+      action="construction.act_window_project" />
+
+
+
+
+    <record model="ir.ui.view" id="construction.block_tree">
+      <field name="name">Danh sach block</field>
+      <field name="model">construction.block</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="state" />
+          <field name="list_supplies" />
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="construction.block_form">
+      <field name="name">Thong tin block</field>
+      <field name="model">construction.block</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name" />
+              <field name="state" />
+              <field name="list_supplies" />
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="construction.act_window_block">
+      <field name="name">Danh sach block window</field>
+      <field name="res_model">construction.block</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Block"
+      id="menu_block"
+      sequence="20"
+      parent="menu_root"
+      action="construction.act_window_block"
+      />
+
+
+    <record model="ir.ui.view" id="construction.state_project_tree">
+      <field name="name">Danh sach giai doan</field>
+      <field name="model">construction.state_project</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="date_start" />
+          <field name="date_end" />
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="construction.state_project_form">
+      <field name="name">Thong tin giai doan window</field>
+      <field name="model">construction.state_project</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name" />
+              <field name="date_start" />
+              <field name="date_end" />
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="construction.act_window_state_project">
+      <field name="name">Danh sach giai doan window</field>
+      <field name="res_model">construction.state_project</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="State Project"
+      id="menu_state_project"
+      sequence="40"
+      parent="menu_root"
+      action="construction.act_window_state_project"
+      />
+
+  </data>
+</odoo>
