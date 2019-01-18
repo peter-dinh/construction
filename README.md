@@ -3,7 +3,7 @@
 Field | Infomation
 ------------ | -------------
 Name | Construction
-Author | ![Peter Dinh](https://github.com/peter-dinh)
+Author | [Peter Dinh](https://github.com/peter-dinh)
 Odoo version | 12.0
 Module version | 1.0.0
 Depends | `base`, `stock`
@@ -14,7 +14,7 @@ Hệ thống đã tích hợp sẵn module Stock. Moduel quản lý xây dựng 
 
 ## Relationship
 ### BFD Diagram:
-![BFD](https://github.com/peter-dinh/construction/tree/master/static/src/img/BFD.png)
+![BFD](https://github.com/peter-dinh/construction/blob/master/static/src/img/BFD.png "BFD Diagram")
 
 ### Model Class:
 
