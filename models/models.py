@@ -22,7 +22,7 @@ class Perform(models.Model):
     _name = 'construction.perform'
 
     state_id = fields.Many2one('construction.state_project', string='State')
-    block_id = fields.Many2one('construction.block', string='Block', domain=)
+    block_id = fields.Many2one('construction.block', string='Block', domain=[('')])
     project_id = fields.Many2one('construction.project', string='Project')
     requirement = fields.Many2one('construction.material_requirements', string='Requirements')
     result = fields.Selection(selection=[('processing', 'Processing'), ('cancel', 'Cancel'), ('success', 'Success')], required=True, default='processing')

@@ -1,6 +1,6 @@
 # Module Construction ()
 
- | 
+Field | Infomation
 ------------ | -------------
 Name | Construction
 Author | ![Peter Dinh](https://github.com/peter-dinh)
@@ -14,6 +14,7 @@ Hệ thống đã tích hợp sẵn module Stock. Moduel quản lý xây dựng 
 
 ## Relationship
 ### BFD Diagram:
+![BFD](https://github.com/peter-dinh/construction/tree/master/static/src/img/BFD.png)
 
 ### Model Class:
 
@@ -22,22 +23,29 @@ Hệ thống đã tích hợp sẵn module Stock. Moduel quản lý xây dựng 
 ## Views
 
 ### Menu:
-your_module
-|-- ...
-`-- tests
-    |-- __init__.py
-    |-- test_bar.py
-    `-- test_foo.py
+```
+Construction
+|-- Project
+    |-- Projects
+    |-- State
+    `-- Blocks
+
+`-- Stock
+    |-- Products
+    |-- Receipts
+    `-- Return
+```
 
 ### Actions:
 
+
 ## Testing
-Name         | Description 
+TestCase         | Description 
 ------------ | -------------
-Name | Construction
+??? | ???
 
 ## Security
-> All users have rights
-
+> Tất cả các user đều có quyền truy cập
 
 ## Release: 
+> v.1.0
