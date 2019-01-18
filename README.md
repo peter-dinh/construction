@@ -80,7 +80,6 @@ class Material_Detail(models.Model):
     Chi tiết Vật tư cần sử dụng
     """
     _name = 'construction.material_detail'
-    _inherit = 'product.product'
 ```
 
 ``` python
@@ -97,7 +96,22 @@ class Receipt_Detail(models.Model):
     Chi tiết vật tư đã xuất kho
     """
     _name = 'construction.receipt_detail'
-    _inherit = 'product.product'
+```
+
+``` python
+class Return(models.Model):
+    """
+    Danh sách phiếu hoàn trả
+    """
+    _name = 'construction.return'
+```
+
+``` python
+class Return_Detail(models.Model):
+    """
+    Danh sách phiếu hoàn trả
+    """
+    _name = 'construction.return_detail'
 ```
 
 ``` python
@@ -143,3 +157,6 @@ TestCase         | Description
 
 ## Release: 
 > v.1.0
+
+## Features need improvement:
+> Cần thêm tính năng tạo phiếu xuất khi số lượng yêu cầu không đủ để hoàn thành cho qúa trình thực hiện
