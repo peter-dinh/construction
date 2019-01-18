@@ -18,7 +18,83 @@ Hệ thống đã tích hợp sẵn module Stock. Moduel quản lý xây dựng 
 
 ### Model Class:
 
+``` python
+class Project(models.Model):
+    """
+    Danh sách dự án của công ty
+    """
+    _name = 'construction.project'
+```
+
+``` python
+class Perform(models.Model):
+    """
+    Kết quả và yêu cầu của các giai đoạn thực hiện các hạng mục
+    """
+    _name = 'construction.perform'
+```
+
+``` python
+class State_Project(models.Model):
+    """
+    Các giai đoạn của dự án
+    """
+    _name = 'construction.state_project'
+```
+
+``` python
+class Block(models.Model):
+    """
+    Các hạng mục của dự án 
+    """
+    _name = 'construction.block'
+```
+
+``` python
+class Material_Requirements(models.Model):
+    """
+    Danh sách yêu cầu vật tư cho giai đoạn triển khai hạng mục
+    """
+    _name = 'construction.material_requirements'
+```
+
+``` python
+class Material_Detail(models.Model):
+    """
+    Chi tiết Vật tư cần sử dụng
+    """
+    _name = 'construction.material_detail'
+    _inherit = 'product.product'
+```
+
+``` python
+class Receipt(models.Model):
+    """
+    Danh sách phiếu xuất vật tư
+    """
+    _name = 'construction.receipt'
+```
+
+``` python
+class Receipt_Detail(models.Model):
+    """
+    Chi tiết vật tư đã xuất kho
+    """
+    _name = 'construction.receipt_detail'
+    _inherit = 'product.product'
+```
+
+``` python
+class Product_For_Construction(models.Model):
+    """
+    Thêm loại sản phẩm dành cho xây dựng.
+    """
+    _inherit = 'product.template'
+```
+
 ### Method decorators:
+
+> Not Data
 
 ## Views
 
@@ -38,6 +114,7 @@ Construction
 
 ### Actions:
 
+> Not Data
 
 ## Testing
 TestCase         | Description 
