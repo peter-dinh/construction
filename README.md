@@ -16,6 +16,22 @@ Hệ thống đã tích hợp sẵn module Stock. Moduel quản lý xây dựng 
 ### BFD Diagram:
 ![BFD](https://github.com/peter-dinh/construction/blob/master/static/src/img/BFD.png "BFD Diagram")
 
+### DFD Diagram:
+#### Context Level
+![Context Level](https://github.com/peter-dinh/construction/blob/master/static/src/img/Context.png "Context Level")
+
+#### Action Project
+![Action Project](https://github.com/peter-dinh/construction/blob/master/static/src/img/Project.png "Action Project")
+
+#### Action Proccessing
+![Action Proccessing](https://github.com/peter-dinh/construction/blob/master/static/src/img/Proccessing.png "Action Proccessing")
+
+#### Action Receipt
+![Action Receipt](https://github.com/peter-dinh/construction/blob/master/static/src/img/Receipt.png "Action Receipt")
+
+#### Action Return
+![Action Return](https://github.com/peter-dinh/construction/blob/master/static/src/img/Return.png "Action Return")
+
 ### Model Class:
 
 ``` python
@@ -27,11 +43,11 @@ class Project(models.Model):
 ```
 
 ``` python
-class Perform(models.Model):
+class Proccessing(models.Model):
     """
     Kết quả và yêu cầu của các giai đoạn thực hiện các hạng mục
     """
-    _name = 'construction.perform'
+    _name = 'construction.proccessing'
 ```
 
 ``` python
@@ -103,6 +119,7 @@ class Product_For_Construction(models.Model):
 Construction
 |-- Project
     |-- Projects
+    |-- Proccessing
     |-- State
     `-- Blocks
 
