@@ -15,9 +15,9 @@ class Project(models.Model):
     investor = fields.Char(string='Investor')
     company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env.user.company_id.id)
     type_project = fields.Selection(selection=[('bridge', 'Bridge'), ('street', 'Street'), ('building', 'Building')])
-    list_stage = fields.One2many(comodel_name='construction.stage_project', inverse_name='project_id', string='List Stage')
-    list_block = fields.One2many(comodel_name='construction.block', inverse_name='project_id', string='List Block')
-    list_proccessing = fields.One2many(comodel_name='construction.proccessing', inverse_name='project_id', string='List Proccessing')
+    list_stage = fields.One2many('construction.stage_project', inverse_name='project_id', string='List Stage')
+    list_block = fields.One2many('construction.block', inverse_name='project_id', string='List Block')
+    list_proccessing = fields.One2many('construction.proccessing', inverse_name='project_id', string='List Proccessing')
 
 
 class Stage_Project(models.Model):
@@ -49,7 +49,7 @@ class Block(models.Model):
 
     name = fields.Char(string='Name')
     project_id = fields.Many2one('construction.project', string='Project')
-    list_proccessing = fields.One2mnay('construction.proccessing', inverse_id='block_id', string='List Result')
+    list_proccessing = fields.One2many('construction.proccessing', inverse_name='block_id', string='List Result')
 
 
 
@@ -59,8 +59,8 @@ class Proccessing(models.Model):
     """
     _name = 'construction.proccessing'
 
-    stage_id = fields.Many2one('construction.stage_project', string='Stage', domain=[('state_id.project_id', '=', project_id.id)])
-    block_id = fields.Many2one('construction.block', string='Block', domain=[('state_id.project_id', '=', project_id.id)])
+    stage_id = fields.Many2one('construction.stage_project', string='Stage')
+    block_id = fields.Many2one('construction.block', string='Block')
     project_id = fields.Many2one('construction.project', string='Project', required=True)
     requirement = fields.Many2one('construction.material_requirements', string='Requirements')
     date_start = fields.Date(string='Date Start', compute='_get_date_start', store=False)
@@ -88,7 +88,7 @@ class Proccessing(models.Model):
 
     ## Can dieu huong result sau moi trang thai chon
 
-    @api.multy
+    @api.multi
     def update_result_expired(self):
         """
         Cập nhật các quá trình thực hiện hết hạn
@@ -121,11 +121,22 @@ class Material_Requirements(models.Model):
     """
     _name = 'construction.material_requirements'
 
-    name = fields.Char(string="Name")
+    name = fields.Char(string="Name", compute='get_name_requirement')
     project_id = fields.Many2one('construction.project', string='Project', compute='_get_project')
-    proccessing_id = field.Many2one('construction.proccessing', string='Proccessing', store=False, compute='_get_proccessing')
+    proccessing_id = fields.Many2one('construction.proccessing', string='Proccessing', store=False, compute='_get_proccessing')
     list_material = fields.One2many('construction.material_detail', inverse_name='required_id', string='List Materials')
+    total_price = fields.Integer(string='Total price', compute='_get_total_price')
 
+
+    @api.multi
+    def _get_total_price(self):
+        """"""
+        for item in self:
+            list_material = item.env['construction.material_detail'].search([('required_id', '=', id)])
+            total = 0
+            for material_detail in list_material:
+                total += material_detail.product_id.product_tmpl_id.list_price
+            item.write({'total_price': total})
 
     @api.multi
     def _get_project(self):
@@ -155,8 +166,6 @@ class Material_Detail(models.Model):
         for item in self:
             item.write({'project_id': item.required_id.project_id.id})
 
-
-
     @api.constrains('product_id')
     def check_type_product(self):
         """
@@ -167,7 +176,9 @@ class Material_Detail(models.Model):
                 raise ValidationError('Vat tu khong hop le!')
 
 class Picking_for_construction(models.Model):
-    """"""
+    """
+    Ke thua module stoke
+    """
     _name = 'construction.picking.stock'
     _inherits = {'stock.picking': 'stock_picking_id'}
 
@@ -177,10 +188,17 @@ class Picking_for_construction(models.Model):
 
     @api.multi
     def get_list_material(self):
+        """
+        Lay cac vat tu theo yeu cau va tao moi chung.
+        Neu san pham da ton tai thi cap nhat so luong yeu cau
+        """
         for item in self:
             for material in item.required_id.list_material:
-                if not self.evn['stock.move'].search([('product_id', '=', material.product_id.id), ('picking_id', '=', item.id)]).exists():
+                product = self.evn['stock.move'].search([('product_id', '=', material.product_id.id), ('picking_id', '=', item.id)])
+                if not product.exists():
                     self.env['stock.move'].create({'picking_id': item.id, 'product_id': material.product_id.id, 'product_uom_qty': material.quantity})
+                else:
+                    product.write({'product_uom_qty': material.quantity})
 
 
 # class Receipt(models.Model):

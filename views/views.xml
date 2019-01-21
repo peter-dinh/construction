@@ -30,10 +30,10 @@
               <field name="investor" />
             </group>
             <group>
-              <field name="type_project" />
+              <field name="list_block" />
             </group>
             <group>
-              <field name="list_state" />
+              <field name="list_stage" />
             </group>
           </sheet>
         </form>
@@ -63,8 +63,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <field name="state" />
-          <field name="list_supplies" />
+          <field name="project_id" />
         </tree>
       </field>
     </record>
@@ -77,8 +76,8 @@
           <sheet>
             <group>
               <field name="name" />
-              <field name="state" />
-              <field name="list_supplies" />
+              <field name="project_id" />
+              <field name="list_proccessing" />
             </group>
           </sheet>
         </form>
@@ -99,9 +98,9 @@
       />
 
 
-    <record model="ir.ui.view" id="construction.state_project_tree">
+    <record model="ir.ui.view" id="construction.stage_project_tree">
       <field name="name">Danh sach giai doan</field>
-      <field name="model">construction.state_project</field>
+      <field name="model">construction.stage_project</field>
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
@@ -111,9 +110,9 @@
       </field>
     </record>
 
-    <record model="ir.ui.view" id="construction.state_project_form">
+    <record model="ir.ui.view" id="construction.stage_project_form">
       <field name="name">Thong tin giai doan window</field>
-      <field name="model">construction.state_project</field>
+      <field name="model">construction.stage_project</field>
       <field name="arch" type="xml">
         <form>
           <sheet>
@@ -127,17 +126,17 @@
       </field>
     </record>
 
-    <record model="ir.actions.act_window" id="construction.act_window_state_project">
+    <record model="ir.actions.act_window" id="construction.act_window_stage_project">
       <field name="name">Danh sach giai doan window</field>
-      <field name="res_model">construction.state_project</field>
+      <field name="res_model">construction.stage_project</field>
       <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem name="State Project"
-      id="menu_state_project"
+    <menuitem name="Stage Project"
+      id="menu_stage_project"
       sequence="40"
       parent="menu_root"
-      action="construction.act_window_state_project"
+      action="construction.act_window_stage_project"
       />
 
   </data>
