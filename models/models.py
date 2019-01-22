@@ -29,7 +29,7 @@ class Stage_Project(models.Model):
     name = fields.Char(string='Name')
     date_start = fields.Date(string='Date Start')
     date_end = fields.Date(string='Date End')
-    project_id = fields.Many2one('construction.project', string="Project", required=True)
+    project_id = fields.Many2one('construction.project', string="Project")
     list_proccessing = fields.One2many('construction.proccessing', inverse_name='stage_id', string='List Result')
     finish = fields.Boolean(string='Finish')
 
@@ -59,13 +59,19 @@ class Proccessing(models.Model):
     """
     _name = 'construction.proccessing'
 
+
     stage_id = fields.Many2one('construction.stage_project', string='Stage')
     block_id = fields.Many2one('construction.block', string='Block')
     project_id = fields.Many2one('construction.project', string='Project', required=True)
-    requirement = fields.Many2one('construction.material_requirements', string='Requirements')
     date_start = fields.Date(string='Date Start', compute='_get_date_start', store=False)
     date_end = fields.Date(string='Date End', compute='_get_date_end', store=False)
-    result = fields.Selection(selection=[('proccessing', 'Proccessing'), ('expired', 'Expired'), ('finish', 'Finish'), ('fail', 'Fail'), ('success', 'Success')], required=True, default='proccessing')
+    result = fields.Selection(selection=[('proccessing', 'Proccessing'), ('expired', 'Expired'), ('fail', 'Fail'), ('finish', 'Finish')], required=True, default='proccessing')
+    list_material = fields.One2many('construction.material_detail', inverse_name='proccessing_id', string='List Materials')
+    total_price = fields.Float(string='Total price', compute='_get_total_price')
+
+    _sql_constraints = [
+        ('stage_id_unique', 'unique(stage_id)', 'Giai doan nay dang thuc hien')
+    ]
 
     @api.constrains('block_id')
     def _check_block_id(self):
@@ -75,15 +81,16 @@ class Proccessing(models.Model):
         for item in self:
             if item.block_id.project_id !=  item.project_id:
                 raise ValidationError('Hang muc khong hop le!')
-        return 
-    
+        return
+        
+
     @api.constrains('stage_id')
     def _check_stage_id(self):
         """
         Kiem tra giai doan co cung dua an khong?
         """
         for item in self:
-            if item.stage_id.project_id == item.project_id:
+            if item.stage_id.project_id != item.project_id:
                 raise ValidationError('Giai doan khong hop le!')
 
     ## Can dieu huong result sau moi trang thai chon
@@ -97,7 +104,7 @@ class Proccessing(models.Model):
         item_expired.write({'result': 'expired'})
         return True
             
-
+    @api.depends('stage_id')
     @api.multi
     def _get_date_start(self):
         """
@@ -105,7 +112,8 @@ class Proccessing(models.Model):
         """
         for item in self:
             item.date_start = self.env['construction.stage_project'].search([('id', '=', item.stage_id.id)], limit=1).date_start
-
+    
+    @api.depends('stage_id')
     @api.multi
     def _get_date_end(self):
         """
@@ -114,29 +122,41 @@ class Proccessing(models.Model):
         for item in self:
             item.date_end = self.env['construction.stage_project'].search([('id', '=', item.stage_id.id)], limit=1).date_end
 
+    def do_finish(self):
+        return
 
-class Material_Requirements(models.Model):
-    """
-    Danh sách yêu cầu vật tư cho giai đoạn triển khai hạng mục
-    """
-    _name = 'construction.material_requirements'
+    def do_fail(self):
+        return
+            
 
-    name = fields.Char(string="Name", compute='get_name_requirement')
-    project_id = fields.Many2one('construction.project', string='Project', compute='_get_project')
-    proccessing_id = fields.Many2one('construction.proccessing', string='Proccessing', store=False, compute='_get_proccessing')
-    list_material = fields.One2many('construction.material_detail', inverse_name='required_id', string='List Materials')
-    total_price = fields.Integer(string='Total price', compute='_get_total_price')
-
-
-    @api.multi
+    @api.depends('list_material')
     def _get_total_price(self):
         """"""
         for item in self:
-            list_material = item.env['construction.material_detail'].search([('required_id', '=', id)])
+            # list_material = item.env['construction.material_detail'].search([('proccessing_id', '=', id)])
+            print(item.list_material)
             total = 0
-            for material_detail in list_material:
-                total += material_detail.product_id.product_tmpl_id.list_price
-            item.write({'total_price': total})
+            for material_detail in item.list_material:
+                total += material_detail.product_id.list_price * material_detail.quantity
+            item.total_price = total
+
+class Material_Detail(models.Model):
+    """
+    Chi tiết Vật tư cần sử dụng
+    """
+    _name = 'construction.material_detail'
+
+    proccessing_id = fields.Many2one('construction.proccessing', string='Proccessing')
+    project_id = fields.Many2one('construction.project', string='Project')
+    product_id = fields.Many2one('product.template', string="Material")
+    quantity = fields.Integer(string="Quanity")
+    price = fields.Float(string="Price", compute="_get_price_product", store=False)
+    enough = fields.Boolean(string='Enough', default=False)
+
+    @api.one
+    @api.depends('product_id')
+    def _get_price_product(self):
+        self.price = self.product_id.list_price
 
     @api.multi
     def _get_project(self):
@@ -147,33 +167,18 @@ class Material_Requirements(models.Model):
             item.write({'project_id': item.proccessing_id.project_id.id})
 
 
-class Material_Detail(models.Model):
-    """
-    Chi tiết Vật tư cần sử dụng
-    """
-    _name = 'construction.material_detail'
-
-    required_id = fields.Many2one('construction.material_requirements', string='Required')
-    product_id = fields.Many2one('product.product', string="Material")
-    quantity = fields.Integer(string="Quanity")
-    enough = fields.Boolean(string='Enough', default=False)
-
-    @api.multi
-    def _get_project(self):
-        """
-        Lay thong tin du an
-        """
-        for item in self:
-            item.write({'project_id': item.required_id.project_id.id})
-
     @api.constrains('product_id')
     def check_type_product(self):
         """
         Kiem tra loai vat tu
         """
-        for item in self:
-            if item.product_id.type != 'construction':
-                raise ValidationError('Vat tu khong hop le!')
+        if self.product_id.type != 'construction':
+            print('khong hop le')
+            raise ValidationError('Vat tu khong hop le!')
+        else:
+            print('Hop le')
+        
+
 
 class Picking_for_construction(models.Model):
     """
@@ -200,62 +205,6 @@ class Picking_for_construction(models.Model):
                 else:
                     product.write({'product_uom_qty': material.quantity})
 
-
-# class Receipt(models.Model):
-#     """
-#     Danh sách phiếu xuất vật tư
-#     """
-#     _name = 'construction.receipt'
-
-#     name = fields.Char(string='Name')
-#     required_id = fields.Many2one('construction.requirements', string='Required')
-#     list_detail = fields.One2many('construction.receipt_detail', string='List Detail')
-
-
-# class Receipt_Detail(models.Model):
-#     """
-#     Chi tiết vật tư đã xuất kho
-#     """
-#     _name = 'construction.receipt_detail'
-
-#     receipt_id = fields.Many2one('construction.receipt', string='Receipt')
-#     product_id = fields.Many2one('product.product', string="Material")
-#     quantity = fields.Integer(string="Quanity", compute='_get_max_qty')
-#     stage = fields.Selection(string='Stage', selection=[])
-
-#     @api.multi
-#     def _get_max_qty(self):
-#         for item in self:
-#             quantity = item.product_id.product_tmpl_id.qty_available
-#             qty_required = item.required_id.quantity
-            
-#             if qty_required > quantity:
-#                 item.quantity = quantity
-#             else:
-#                 item.quantity 
-
-
-# class Return(models.Model):
-#     """
-#     Danh sách phiếu hoàn trả
-#     """
-#     _name = 'construction.return'
-
-#     name = fields.Char(string='Name')
-#     required_id = fields.Many2one('construction.requirements', string='Required')
-#     list_detail = fields.One2many('construction.return_detail', string='List Detail')
-
-
-# class Return_Detail(models.Model):
-#     """
-#     Danh sách phiếu hoàn trả
-#     """
-#     _name = 'construction.return_detail'
-
-#     receipt_id = fields.Many2one('construction.receipt', string='Receipt')
-#     product_id = fields.Many2one('product.product', string="Material")
-#     quantity = fields.Integer(string="Quanity")
-#     stage = fields.Selection(string='Stage', selection=[])
 
 
 class Product_For_Construction(models.Model):

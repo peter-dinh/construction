@@ -3,5 +3,4 @@ access_construction_project,construction.project,model_construction_project,,1,1
 access_construction_proccessing,construction.proccessing,model_construction_proccessing,,1,1,1,1
 access_construction_stage_project,construction.stage_project,model_construction_stage_project,,1,1,1,1
 access_construction_block,construction.block,model_construction_block,,1,1,1,1
-access_construction_material_requirements,construction.material_requirements,model_construction_material_requirements,,1,1,1,1
 access_construction_material_detail,construction.material_detail,model_construction_material_detail,,1,1,1,1

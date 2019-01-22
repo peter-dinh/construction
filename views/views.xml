@@ -5,6 +5,12 @@
       id="menu_root" 
       sequence="100"
       web_icon="construction,static/description/icon.png" />
+    
+    <menuitem name="Initialization" 
+      id="construction.initialization"
+      parent="menu_root" 
+      sequence="10"
+      />
 
     <record model="ir.ui.view" id="construction.project_tree">
       <field name="name">Danh sach du an</field>
@@ -30,10 +36,20 @@
               <field name="investor" />
             </group>
             <group>
-              <field name="list_block" />
+              <field name="list_block" widget="one2many_list">
+                <tree editable="bottom">
+                  <field name="name" />
+                </tree>
+              </field>
             </group>
             <group>
-              <field name="list_stage" />
+              <field name="list_stage" >
+                <tree editable="bottom">
+                  <field name="name" />
+                  <field name="date_start" />
+                  <field name="date_end" />
+                </tree>
+              </field>
             </group>
           </sheet>
         </form>
@@ -50,7 +66,7 @@
 
     <menuitem name="Project" 
       id="construction.project"
-      parent="menu_root" 
+      parent="construction.initialization" 
       sequence="10"
       action="construction.act_window_project" />
 
@@ -76,8 +92,8 @@
           <sheet>
             <group>
               <field name="name" />
-              <field name="project_id" />
-              <field name="list_proccessing" />
+              <field name="project_id" class="oe_read_only" />
+              <field name="list_proccessing" class="oe_read_only" />
             </group>
           </sheet>
         </form>
@@ -93,7 +109,7 @@
     <menuitem name="Block"
       id="menu_block"
       sequence="20"
-      parent="menu_root"
+      parent="construction.initialization"
       action="construction.act_window_block"
       />
 
@@ -120,6 +136,8 @@
               <field name="name" />
               <field name="date_start" />
               <field name="date_end" />
+              <field name="project_id" class="oe_read_only" />
+              <field name="list_proccessing" class="oe_read_only" />
             </group>
           </sheet>
         </form>
@@ -131,13 +149,146 @@
       <field name="res_model">construction.stage_project</field>
       <field name="view_mode">tree,form</field>
     </record>
+    
 
     <menuitem name="Stage Project"
       id="menu_stage_project"
       sequence="40"
-      parent="menu_root"
+      parent="construction.initialization"
       action="construction.act_window_stage_project"
       />
 
+    
+    <record id="construction.proccessing_form" model="ir.ui.view">
+        <field name="name">Danh sach thuc hien form</field>
+        <field name="model">construction.proccessing</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+              <header>
+                <field name="result" widget="statusbar" />
+              </header>
+              <sheet>
+              <div class="oe_button_box" name="button_box">
+                <button type="object" name="button_total_price" class="oe_stat_button" icon="fa-money" attrs="{'readonly': True}">
+                    <field name="total_price" widget="statinfo" nolabel="1" readonly="1" />
+                </button>
+              </div>
+                <group>
+                  <field name="project_id" options="{'no_create': True}" />
+                  <field name="stage_id" options="{'no_create': True}" attrs="{'invisible': [('project_id', '=', 'False')]}" domain="[('project_id', '=', project_id)]" />
+                  <field name="block_id" options="{'no_create': True}" attrs="{'invisible': [('project_id', '=', 'False')]}" domain="[('project_id', '=', project_id)]" />
+                  <field name="date_start" />
+                  <field name="date_end" />
+                  <field name="list_material">
+                    <tree editable="bottom">
+                      <field name="product_id" domain="[('type', '=', 'construction')]"/>
+                      <field name="quantity" />
+                      <field name="price" readonly="1" />
+                    </tree>
+                  </field>
+                </group>
+              </sheet>
+            </form>
+        </field>
+    </record>
+    
+
+    
+    <record id="construction.proccessing_tree" model="ir.ui.view">
+        <field name="name">danh sach thuc hien tree</field>
+        <field name="model">construction.proccessing</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+              <field name="project_id"/>
+              <field name="block_id"/>
+              <field name="stage_id"/>
+            </tree>
+        </field>
+    </record>
+    
+
+    <record id="construction.act_window_proccessing" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Danh sach thuc hien</field>
+        <field name="res_model">construction.proccessing</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+
+    <menuitem name="Operations"
+      id="construction.Operations"
+      sequence="30"
+      parent="menu_root"
+      />
+    
+    <menuitem name="Proccessing"
+      id="construction.Proccessing"
+      sequence="10"
+      parent="construction.Operations"
+      action="construction.act_window_proccessing"
+      />
+
+
+    <record id="construction.transfers" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Transfers</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    
+    <menuitem name="Transfers"
+      id="construction.Transfers"
+      sequence="20"
+      parent="construction.Operations"
+      action="construction.transfers"
+      />
+
+    
+    <!-- <record id="construction.delivery" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">delivery</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_type">form</field>
+        <field name="target">current</field>
+        <field name="domain">[]</field>
+        <field name="context">\{}</field>
+        <field name="search_view_id" ref="ir.ui.view" />
+    </record>
+    
+    
+    <menuitem name="Delivery"
+      id="construction.Delivery"
+      sequence="30"
+      parent="construction.Operations"
+      action="construction.act_window_stage_project"
+      /> -->
+
+
+    
+    <record id="construction.act_window_materail" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Danh sach vat tu</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+    
+
+    <menuitem name="Master Data"
+      id="construction.master_data"
+      sequence="40"
+      parent="menu_root"
+      />
+
+    <menuitem name="Material"
+      id="construction.Material"
+      sequence="10"
+      parent="construction.master_data"
+      action="construction.act_window_materail"
+      />
+    
   </data>
 </odoo>
