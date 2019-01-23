@@ -70,7 +70,7 @@ class Proccessing(models.Model):
     total_price = fields.Float(string='Total price', compute='_get_total_price')
 
     _sql_constraints = [
-        ('stage_id_unique', 'unique(stage_id)', 'Giai doan nay dang thuc hien')
+        ('stage_id_unique', 'unique (stage_id)', 'Giai doan nay dang thuc hien')
     ]
 
     @api.constrains('block_id')
@@ -184,12 +184,14 @@ class Picking_for_construction(models.Model):
     """
     Ke thua module stoke
     """
-    _name = 'construction.picking.stock'
-    _inherits = {'stock.picking': 'stock_picking_id'}
+    _inherit = 'stock.picking'
 
-    required_id = fields.Many2one('construction.material_requirements', string='Required', ondelete='cascade')
-    stock_picking_id = fields.Many2one('stock.picking', 'Stock Picking', auto_join=True, index=True, ondelete='cascade', required=True)
+    is_construction = fields.Selection(selection=[(False, 'False'), (True, 'True')], required=True, default=False)
+    required_id = fields.Many2one('construction.proccessing', string='Required', ondelete='cascade')
 
+    @api.multi
+    def get_list_material_requirement(self):
+        return
 
     @api.multi
     def get_list_material(self):
